@@ -4,6 +4,7 @@
 import assert = require('assert');
 import * as restm from 'typed-rest-client/RestClient';
 import * as util from 'typed-rest-client/Util';
+import * as ifm from 'typed-rest-client/Interfaces';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -48,6 +49,28 @@ describe('Rest Tests', function () {
         let restRes: restm.IRestResponse<HttpBinData> = await _rest.get<HttpBinData>('https://httpbin.org/get');
         assert(restRes.statusCode == 200, "statusCode should be 200");
         assert(restRes.result && restRes.result.url === 'https://httpbin.org/get');
+    });
+
+    it('gets a resource using a custom content handler', async() => {
+        this.timeout(3000);
+        class xmlContentHandler implements ifm.IContentHandler {
+            canHandle(response: ifm.IHttpClientResponse): boolean {
+                return response.message.headers["content-type"].indexOf('application/xml') > -1;
+            }
+            handle(contents: string) {
+                if (contents.startsWith('<?xml')) { 
+                    return {
+                        url: 'https://httpbin.org/xml'
+                    } 
+                } 
+            }
+
+        }
+        let restRes: restm.IRestResponse<HttpBinData> = await _rest.get<HttpBinData>('https://httpbin.org/xml', {
+            contentHandlers: [new xmlContentHandler()]
+        });
+        assert(restRes.statusCode == 200, "statusCode should be 200");
+        assert(restRes.result && restRes.result.url === 'https://httpbin.org/xml');
     });
 
     it('gets a resource with baseUrl', async() => {

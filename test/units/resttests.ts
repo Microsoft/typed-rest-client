@@ -62,6 +62,35 @@ describe('Rest Tests', function () {
         assert(restRes.result && restRes.result.url === 'http://microsoft.com');
     });
 
+    it('gets a xml resource', async() => {
+        const responseXml = '<?xml><root><child>child content</child></root>'
+        nock('http://microsoft.com/')
+            .get('/xml')
+            .reply(200, responseXml, {
+                'Content-Type': 'application/xml',
+                'my-header': 'my-header-val'
+            });
+
+        class xmlContentHandler implements ifm.IContentHandler {
+            canHandle(response: ifm.IHttpClientResponse): boolean {
+                return response.message.headers["content-type"].indexOf('application/xml') > -1;
+            }
+            handle(contents: string) {
+                assert(contents === responseXml)
+                return {
+                    url: 'http://microsoft.com'
+                } 
+            }
+
+        }
+        let restRes: restm.IRestResponse<HttpData> = await _rest.get<HttpData>('http://microsoft.com/xml', {
+            contentHandlers: [new xmlContentHandler()]
+        });
+        assert(restRes.headers['my-header'] === 'my-header-val', 'Response should include headers');
+        assert(restRes.statusCode == 200, "statusCode should be 200");
+        assert(restRes.result && restRes.result.url === 'http://microsoft.com');
+    });
+
     it('gets a resource with baseUrl', async() => {
         nock('http://microsoft.com')
             .get('/')
