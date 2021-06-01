@@ -134,6 +134,29 @@ describe('Rest Tests', function () {
         assert(restRes.result && restRes.result.json === 'foo');
     });
 
+    it('creates a resource with a url encoded body', async () => {
+        nock('http://microsoft.com')
+            .post('/')
+            .reply(200, function (uri, requestBody) {
+                let body = decodeURI(requestBody);
+                return {
+                    url: 'http://microsoft.com/post',
+                    data: body,
+                    json: null
+                };
+            });
+        let options: restm.IRequestOptions = {
+            additionalHeaders: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };
+        let res: string = 'url%20encoded%20body';
+        let restRes: restm.IRestResponse<HttpData> = await _rest.create<HttpData>('http://microsoft.com', res, options);
+        assert(restRes.statusCode == 200, "statusCode should be 200");
+        assert(restRes.result && restRes.result.url === 'http://microsoft.com/post');
+        assert(restRes.result && restRes.result.data === 'url encoded body');
+    });
+
     it('creates a resource with a baseUrl', async() => {
         nock('http://microsoft.com')
             .post('/')

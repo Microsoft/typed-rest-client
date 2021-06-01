@@ -11,7 +11,8 @@ export interface HttpBinData {
     url: string;
     data: any;
     json: any;
-    args?: any
+    args?: any;
+    form: any;
 }
 
 describe('Rest Tests', function () {
@@ -91,6 +92,19 @@ describe('Rest Tests', function () {
         assert(restRes.statusCode == 200, "statusCode should be 200");
         assert(restRes.result && restRes.result.url === 'https://httpbin.org/post');
         assert(restRes.result && restRes.result.json.name === 'foo');
+    });
+
+    it('creates a resource with a url encoded body', async () => {
+        let options: restm.IRequestOptions = {
+            additionalHeaders: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            }
+        };
+        let res: string = 'body=url%20encoded%20body';
+        let restRes: restm.IRestResponse<HttpBinData> = await _restBin.create<HttpBinData>('post', res, options);
+        assert(restRes.statusCode == 200, "statusCode should be 200");
+        assert(restRes.result && restRes.result.url === 'https://httpbin.org/post');
+        assert(restRes.result && restRes.result.form.body === 'url encoded body');
     });
 
     it('creates a resource with a baseUrl', async() => {
