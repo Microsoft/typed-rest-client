@@ -84,3 +84,11 @@ export interface IRequestQueryParams {
     }
 }
 
+export interface IContentHandler {
+    canHandle(response: IHttpClientResponse): boolean
+    handle(contents: string): any
+}
+
+export interface IResponseOptions {
+    contentHandlers?: IContentHandler[];
+}

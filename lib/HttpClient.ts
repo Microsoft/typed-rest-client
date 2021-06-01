@@ -102,6 +102,7 @@ export class HttpClient implements ifm.IHttpClient {
     userAgent: string | null | undefined;
     handlers: ifm.IRequestHandler[];
     requestOptions: ifm.IRequestOptions;
+    responseOptions: ifm.IResponseOptions;
 
     private _ignoreSslError: boolean = false;
     private _socketTimeout: number;
@@ -121,7 +122,7 @@ export class HttpClient implements ifm.IHttpClient {
     private _cert: string;
     private _key: string;
 
-    constructor(userAgent: string | null | undefined, handlers?: ifm.IRequestHandler[], requestOptions?: ifm.IRequestOptions) {
+    constructor(userAgent: string | null | undefined, handlers?: ifm.IRequestHandler[], requestOptions?: ifm.IRequestOptions, responseOptions?: ifm.IResponseOptions) {
         this.userAgent = userAgent;
         this.handlers = handlers || [];
         let no_proxy: string = process.env[EnvironmentVariables.NO_PROXY];
@@ -131,7 +132,11 @@ export class HttpClient implements ifm.IHttpClient {
                 this._httpProxyBypassHosts.push(util.buildProxyBypassRegexFromEnv(bypass));
             });
         }
-
+        this.responseOptions = responseOptions || {};
+        if(!this.responseOptions.contentHandlers) { 
+            this.responseOptions.contentHandlers = [];
+        };
+        
         this.requestOptions = requestOptions;
         if (requestOptions) {
             if (requestOptions.ignoreSslError != null) {

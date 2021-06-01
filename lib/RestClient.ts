@@ -4,6 +4,7 @@
 import httpm = require('./HttpClient');
 import ifm = require("./Interfaces");
 import util = require("./Util");
+import chm = require("./ContentHandlers");
 
 export interface IRestResponse<T> {
     statusCode: number,
@@ -17,7 +18,7 @@ export interface IRequestOptions {
     acceptHeader?: string,
     // since accept is defaulted, set additional headers if needed
     additionalHeaders?: ifm.IHeaders,
-
+    contentHandlers?: ifm.IContentHandler[],
     responseProcessor?: Function,
     //Dates aren't automatically deserialized by JSON, this adds a date reviver to ensure they aren't just left as strings
     deserializeDates?: boolean,
@@ -184,15 +185,9 @@ export class RestClient {
         return headers;
     }
 
-    private static dateTimeDeserializer(key: any, value: any): any {
-        if (typeof value === 'string'){
-            let a = new Date(value);
-            if (!isNaN(a.valueOf())) {
-                return a;
-            }
-        }
 
-        return value;
+    protected getHandlers(requestHandlers?: ifm.IContentHandler[]): ifm.IContentHandler[] {
+        return (requestHandlers ? requestHandlers.concat(this.client.responseOptions.contentHandlers) : this.client.responseOptions.contentHandlers) || []
     }
 
     protected async processResponse<T>(res: httpm.HttpClientResponse, options: IRequestOptions): Promise<IRestResponse<T>> {
@@ -217,11 +212,11 @@ export class RestClient {
             try {
                 contents = await res.readBody();
                 if (contents && contents.length > 0) {
-                    if (options && options.deserializeDates) {
-                        obj = JSON.parse(contents, RestClient.dateTimeDeserializer);
-                    } else {
-                        obj = JSON.parse(contents);
-                    }
+                    const contentHandlers = this.getHandlers(options ? options.contentHandlers : undefined);
+                    const handler = contentHandlers.find((handler) => {
+                        return handler.canHandle(res);
+                    }) || new chm.DefaultJsonHandler(options && options.deserializeDates);
+                    obj = handler.handle(contents);
                     if (options && options.responseProcessor) {
                         response.result = options.responseProcessor(obj);
                     }
