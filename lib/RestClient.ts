@@ -104,7 +104,7 @@ export class RestClient {
         resources: any,
         options?: IRequestOptions): Promise<IRestResponse<T>> {
 
-        let url: string = util.getUrl(resource, this._baseUrl);
+        let url: string = util.getUrl(resource, this._baseUrl, (options || {}).queryParameters);
         let headers: ifm.IHeaders = this._headersFromOptions(options, true);
 
         let data: string = JSON.stringify(resources, null, 2);
@@ -123,7 +123,7 @@ export class RestClient {
         resources: any,
         options?: IRequestOptions): Promise<IRestResponse<T>> {
 
-        let url: string = util.getUrl(resource, this._baseUrl);
+        let url: string = util.getUrl(resource, this._baseUrl, (options || {}).queryParameters);
         let headers: ifm.IHeaders = this._headersFromOptions(options, true);
 
         let data: string = JSON.stringify(resources, null, 2);
@@ -142,7 +142,7 @@ export class RestClient {
         resources: any,
         options?: IRequestOptions): Promise<IRestResponse<T>> {
 
-        let url: string = util.getUrl(resource, this._baseUrl);
+        let url: string = util.getUrl(resource, this._baseUrl, (options || {}).queryParameters);
         let headers: ifm.IHeaders = this._headersFromOptions(options, true);
 
         let data: string = JSON.stringify(resources, null, 2);

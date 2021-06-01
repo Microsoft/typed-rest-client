@@ -101,6 +101,36 @@ describe('Rest Tests', function () {
         assert(restRes.result && restRes.result.json.name === 'foo');
     });
 
+   it('creates a resource passing Query Parameters', async () => {
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _rest.create<HttpBinData>('https://httpbin.org/post', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result.url === 'https://httpbin.org/post?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
+
+	it('creates a resource with baseUrl passing Query Parameters', async () => {
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _restBin.create<HttpBinData>('post', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result && restRes.result.url === 'https://httpbin.org/post?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
+
     it('replaces a resource', async() => {
         this.timeout(3000);
 
@@ -119,6 +149,40 @@ describe('Rest Tests', function () {
         assert(restRes.result && restRes.result.json.name === 'foo');
     });
 
+   it('puts a resource passing Query Parameters', async () => {
+		this.timeout(3000);
+
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _rest.replace<HttpBinData>('https://httpbin.org/put', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result && restRes.result.url === 'https://httpbin.org/put?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
+
+	it('puts a resource with baseUrl passing Query Parameters', async () => {
+		this.timeout(3000);
+
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _restBin.replace<HttpBinData>('put', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result && restRes.result.url === 'https://httpbin.org/put?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
+
     it('updates a resource', async() => {
         let res: any = { name: 'foo' };
         let restRes: restm.IRestResponse<HttpBinData> = await _rest.update<HttpBinData>('https://httpbin.org/patch', res);
@@ -134,6 +198,36 @@ describe('Rest Tests', function () {
         assert(restRes.result && restRes.result.url === 'https://httpbin.org/patch');
         assert(restRes.result && restRes.result.json.name === 'foo');
     });
+
+   it('updates a resource passing Query Parameters', async () => {
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _rest.update<HttpBinData>('https://httpbin.org/patch', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result && restRes.result.url === 'https://httpbin.org/patch?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
+
+	it('updates a resource with baseUrl passing Query Parameters', async () => {
+		let res: any = { name: 'foo' };
+		let restRes: restm.IRestResponse<HttpBinData> = await _restBin.update<HttpBinData>('patch', res, _options);
+		assert(restRes.statusCode == 200, "statusCode should be 200");
+		assert(restRes.result && restRes.result.url === 'https://httpbin.org/patch?id=1&type=compact');
+		assert(restRes.result && restRes.result.json.name === 'foo');
+
+		Object.keys(_options.queryParameters.params).forEach(key => {
+			const actual = restRes.result.args[key];
+			const expected = _options.queryParameters.params[key];
+
+			assert(expected == actual);
+		})
+	});
 
     it('deletes a resource', async() => {
         let restRes: restm.IRestResponse<HttpBinData> = await _rest.del<HttpBinData>('https://httpbin.org/delete');
